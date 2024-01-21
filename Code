@@ -1,0 +1,138 @@
+float h=0;                                 //we identify the initial rotation rate 
+float steps = 50;                          // The amount of steps needed to create a mandala
+float r=0;                                 // we identify r,b,g as the initial colors, we start with black and gradually move to white
+float g=0; 
+float b=0;
+float strokes = 255;                       // we identify the color of the strokes, starting with white then moving to black
+float gradiant = 255/steps;                // The color gradiant is equal to 255 divided by the number of steps so that the change of color is equal between all the steps
+
+// setiing up the program by creating a canva that's 800 pixels wide and 800 pixels long, for the purpose of this program, it makes more aesthetic sense to have the width and the height be equal
+
+void setup () {
+  size (800, 800);
+}
+
+// we create a function named "star" that takes in the center coordinates of the star as well 
+//as the inner and outer radii of its points and the number of outer points
+
+void star  (float x, float y, float inR, float outR, float nPoint) {
+
+  // we define "angle" as 360 degress divided by the number of outer points so that the angles
+  // between the outer points are equal, then we define the half of that angle as "halfAngle
+
+
+  float angle = TWO_PI / nPoint;
+  float halfAngle = angle/2;
+
+  // we draw a continuous shape using a for loop, we define the angle at work as a and we start at
+  // 0, as long as that angle is smaller than 360 degrees, the for loop continues, and adds an "angle"
+  // to the value of a the for loop will draw the inner and outer parameters of the star
+
+
+  beginShape();
+  for (float a = 0; a < TWO_PI; a += angle) {
+
+    // the x-coordinate of the outer point of the star will equal the center x coordinate + the 
+    // cos of angle a multipled by the outer radius
+    // whereas the y-coordinate of the outer point of the star will equal the center y coordinate +  
+    // the sin of angle a multipled by the outer radius
+
+
+    float starx = x + cos(a) * outR;
+    float stary = y + sin(a) * outR;
+
+    // we start that vertex on that point
+
+    vertex(starx, stary);
+
+    // the x-coordinate of the inner point of the star will equal the center x coordinate + the 
+    // cos of half the angle of a, since it would be in the middle of that angle multipled 
+    // by the inner radius whereas the y-coordinate of the inner point of the star will equal the 
+    // center y coordinate + the sin of half the angle of a multipled by the inner radius
+
+    starx = x + cos(a+halfAngle) * inR;
+    stary = y + sin(a+halfAngle) * inR;
+
+    // we define that as the next point of the vertex
+
+    vertex(starx, stary);
+
+    // the for loop continues drawing the star based on the number of outer points provided until
+    // the shape is complete
+  }
+  endShape(CLOSE);
+}
+
+// we create a function named "mandala" that takes in the center coordinates of the mandala, as
+// well as the number of outer points for the number of steps
+
+void mandala (float x, float y, float sWidth, int nPoint, int steps) {
+  
+  // Since we will be using the star function, we identify the needed variables
+  
+  float outR = sWidth/steps;       //The outer radius incrememnt will be equal to the width of the mandala divided by the number of steps
+  float inR = outR*70/100;         //The inner radius will be 70% of the outer radius
+  float r=0;                       // we identify r,b,g as the initial colors, we start with black and gradually move to white
+  float g=0;
+  float b=0;
+  float strokes = 255;             // we identify the color of the strokes, starting with white then moving to black
+  float gradiant = 255/steps;      // The color gradiant is equal to 255 divided by the number of steps so that the change of color is equal between all the steps
+  
+  // We draw a contnious shape using a for loop, the loop will draw as many stars as there are steps, starting with the biggest star 
+  
+  for (int i=steps; i>0; i--) {
+    
+    // we color the fill with the previosuly declared variables r,g,b and the stroke with strokes, adding a transparancy of 100 
+    
+    fill (r, g, b);
+    stroke (strokes, 100);
+    
+    //we then use the function star while rotating it 1 degree to the left
+    
+    star(x, y, inR*i, outR*i, nPoint);
+    rotate (degrees (-1));
+    
+  // to have the fill and stroke of the star change with each step, with the fill getting whiter and the stoke getting blacker, we have the stroke decrease 
+  // from 255 by the previously defined gradiant variable until it reaches 0 then it stays as 0, and we do the opposited for the fill, starting from 0 and
+  // moving towards 255, and when it reaches 255 it remains at that color
+    
+    strokes = strokes - gradiant;
+    if (strokes <=0) {
+      strokes = 0;
+    }
+    
+    r = r + gradiant;
+    if (r>=255) {
+      r=255;
+    }
+    
+    g = g + gradiant;
+    if (g>=255) {
+      g=255;
+    }
+    
+    b = b + gradiant;
+    if (b>=255) {
+      b=255;
+    }
+    
+  }
+}
+
+//Lastly we use the void draw function and we set the background to black so that it matches the color of the biggest star, then 
+// we translate the initial coordinates of the drawing to mouseX and mouseY so that the mandala moves with the mouse
+
+void draw () {
+  background (0);
+  translate (mouseX, mouseY);
+  
+  // we rotate the drawing by h degrees which is increasng by 1 degree every cycle of drawing which makes the shape rotate
+  
+  rotate (degrees (h));
+  h = h + 1;
+
+// then we implement the mandala function with the center coordinates as 0,0 which would be following the mouse, we 
+//make it's width/2 so that it's as big as the screen and we give it 8 outer points and 50 steps createing the needed shape
+
+  mandala (0, 0, width/2, 8, 50);
+}
